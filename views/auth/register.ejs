@@ -1,0 +1,28 @@
+<%- include("../partials/header", { clinicName, area }) %>
+    <main class="booking-section section-padding">
+      <div class="container">
+        <div class="booking-panel mx-auto">
+          <h1 class="booking-step-title">Create your patient account</h1>
+          <% if (errors.form) { %><div class="alert alert-danger" role="alert"><%= errors.form %></div><% } %>
+          <form method="post" action="/register">
+            <div class="mb-3">
+              <label class="form-label" for="name">Name</label>
+              <input class="form-control <%= errors.name ? 'is-invalid' : '' %>" id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="100" value="<%= form.name || '' %>" required>
+              <% if (errors.name) { %><div class="invalid-feedback"><%= errors.name %></div><% } %>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="email">Email</label>
+              <input class="form-control <%= errors.email ? 'is-invalid' : '' %>" id="email" name="email" type="email" autocomplete="email" maxlength="254" value="<%= form.email || '' %>" required>
+              <% if (errors.email) { %><div class="invalid-feedback"><%= errors.email %></div><% } %>
+            </div>
+            <div class="mb-4">
+              <label class="form-label" for="password">Password</label>
+              <input class="form-control <%= errors.password ? 'is-invalid' : '' %>" id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+              <% if (errors.password) { %><div class="invalid-feedback"><%= errors.password %></div><% } %>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4" type="submit">Register</button>
+          </form>
+        </div>
+      </div>
+    </main>
+<%- include("../partials/footer", { clinicName }) %>

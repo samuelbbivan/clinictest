@@ -1,0 +1,154 @@
+<%- include("partials/header", { clinicName, area }) %>
+    <main class="booking-section section-padding">
+      <div class="container">
+        <div class="section-heading text-center">
+          <span class="eyebrow">Lakeside Medical Clinic</span>
+          <h1 class="section-title mt-2">Book an appointment</h1>
+          <p class="section-lead">Choose your care, then share your details.</p>
+        </div>
+
+        <div class="booking-panel mx-auto mt-4">
+          <ol class="booking-progress" aria-label="Booking steps">
+            <li class="<%= step >= 1 ? 'is-active' : '' %>">Specialty</li>
+            <li class="<%= step >= 2 ? 'is-active' : '' %>">Doctor</li>
+            <li class="<%= step >= 3 ? 'is-active' : '' %>">Date &amp; time</li>
+            <li class="<%= step >= 4 ? 'is-active' : '' %>">Your details</li>
+          </ol>
+
+          <% if (errors.form) { %>
+            <div class="alert alert-danger" role="alert"><%= errors.form %></div>
+          <% } %>
+
+          <% if (step === 1) { %>
+            <h2 class="booking-step-title">1. Choose a specialty</h2>
+            <form method="post" action="/booking">
+              <input type="hidden" name="step" value="specialty">
+              <div class="mb-4">
+                <label class="form-label" for="specialty">Specialty</label>
+                <select class="form-select <%= errors.specialty ? 'is-invalid' : '' %>" id="specialty" name="specialty" required>
+                  <option value="">Select a specialty</option>
+                  <% Object.keys(specialties).forEach((specialty) => { %>
+                    <option value="<%= specialty %>" <%= form.specialty === specialty ? 'selected' : '' %>><%= specialty %></option>
+                  <% }) %>
+                </select>
+                <% if (errors.specialty) { %><div class="invalid-feedback"><%= errors.specialty %></div><% } %>
+              </div>
+              <button class="btn btn-primary rounded-pill px-4" type="submit">Continue <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></button>
+            </form>
+          <% } %>
+
+          <% if (step === 2) { %>
+            <h2 class="booking-step-title">2. Choose a doctor</h2>
+            <form method="post" action="/booking">
+              <input type="hidden" name="step" value="doctor">
+              <input type="hidden" name="specialty" value="<%= form.specialty %>">
+              <div class="mb-4">
+                <p class="booking-selection-label">Specialty</p>
+                <p class="booking-selection-value"><%= form.specialty %></p>
+                <label class="form-label" for="doctor">Doctor</label>
+                <select class="form-select <%= errors.doctor ? 'is-invalid' : '' %>" id="doctor" name="doctor" required>
+                  <option value="">Select a doctor</option>
+                  <% (specialties[form.specialty] || []).forEach((doctor) => { %>
+                    <option value="<%= doctor %>" <%= form.doctor === doctor ? 'selected' : '' %>><%= doctor %></option>
+                  <% }) %>
+                </select>
+                <% if (errors.doctor) { %><div class="invalid-feedback"><%= errors.doctor %></div><% } %>
+              </div>
+              <div class="d-flex flex-column flex-sm-row gap-2">
+                <button class="btn btn-primary rounded-pill px-4" type="submit">Continue <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></button>
+                <a class="btn btn-link" href="/booking">Start over</a>
+              </div>
+            </form>
+          <% } %>
+
+          <% if (step === 3) { %>
+            <h2 class="booking-step-title">3. Choose a date and time</h2>
+            <p class="booking-selection-value"><%= form.specialty %> · <%= form.doctor %></p>
+            <form method="post" action="/booking">
+              <input type="hidden" name="step" value="appointment">
+              <input type="hidden" name="specialty" value="<%= form.specialty %>">
+              <input type="hidden" name="doctor" value="<%= form.doctor %>">
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label" for="date">Appointment date</label>
+                  <input class="form-control <%= errors.date ? 'is-invalid' : '' %>" id="date" name="date" type="date" min="<%= today %>" value="<%= form.date %>" required>
+                  <% if (errors.date) { %><div class="invalid-feedback"><%= errors.date %></div><% } %>
+                  <div class="form-text">The clinic is closed on Sundays.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="time">Available time</label>
+                  <select class="form-select <%= errors.time ? 'is-invalid' : '' %>" id="time" name="time" required>
+                    <option value="">Select a time</option>
+                    <% timeSlots.forEach((time) => { %>
+                      <% const hour = Number(time.slice(0, 2)); const displayTime = `${hour % 12 || 12}:${time.slice(3)} ${hour < 12 ? 'am' : 'pm'}`; %>
+                      <option value="<%= time %>" <%= form.time === time ? 'selected' : '' %>><%= displayTime %></option>
+                    <% }) %>
+                  </select>
+                  <% if (errors.time) { %><div class="invalid-feedback"><%= errors.time %></div><% } %>
+                  <div class="form-text">Every 30 minutes, 9am–9pm.</div>
+                </div>
+              </div>
+              <button class="btn btn-primary rounded-pill px-4" type="submit">Continue <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></button>
+            </form>
+          <% } %>
+
+          <% if (step === 4 && !review && !confirmed) { %>
+            <h2 class="booking-step-title">4. Your details</h2>
+            <p class="booking-selection-value"><%= form.specialty %> · <%= form.doctor %> · <%= form.date %> at <%= form.time %></p>
+            <form method="post" action="/booking">
+              <input type="hidden" name="step" value="patient">
+              <input type="hidden" name="specialty" value="<%= form.specialty %>">
+              <input type="hidden" name="doctor" value="<%= form.doctor %>">
+              <input type="hidden" name="date" value="<%= form.date %>">
+              <input type="hidden" name="time" value="<%= form.time %>">
+              <div class="row g-3 mb-4">
+                <div class="col-12">
+                  <label class="form-label" for="name">Patient name</label>
+                  <input class="form-control <%= errors.name ? 'is-invalid' : '' %>" id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="100" value="<%= form.name %>" required>
+                  <% if (errors.name) { %><div class="invalid-feedback"><%= errors.name %></div><% } %>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="phone">Phone</label>
+                  <input class="form-control <%= errors.phone ? 'is-invalid' : '' %>" id="phone" name="phone" type="tel" autocomplete="tel" maxlength="25" value="<%= form.phone %>" required>
+                  <% if (errors.phone) { %><div class="invalid-feedback"><%= errors.phone %></div><% } %>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="email">Email</label>
+                  <input class="form-control <%= errors.email ? 'is-invalid' : '' %>" id="email" name="email" type="email" autocomplete="email" maxlength="254" value="<%= form.email %>" required>
+                  <% if (errors.email) { %><div class="invalid-feedback"><%= errors.email %></div><% } %>
+                </div>
+              </div>
+              <button class="btn btn-primary rounded-pill px-4" type="submit">Review booking <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></button>
+            </form>
+          <% } %>
+
+          <% if (step === 4 && review) { %>
+            <h2 class="booking-step-title">Review your appointment</h2>
+            <dl class="booking-summary">
+              <div><dt>Specialty</dt><dd><%= form.specialty %></dd></div>
+              <div><dt>Doctor</dt><dd><%= form.doctor %></dd></div>
+              <div><dt>Date</dt><dd><%= form.date %></dd></div>
+              <div><dt>Time</dt><dd><%= form.time %></dd></div>
+              <div><dt>Patient</dt><dd><%= form.name %></dd></div>
+              <div><dt>Phone</dt><dd><%= form.phone %></dd></div>
+              <div><dt>Email</dt><dd><%= form.email %></dd></div>
+              <div><dt>Refundable consultation deposit</dt><dd>AED 100</dd></div>
+            </dl>
+            <% if (review) { %>
+              <form method="post" action="/booking">
+                <input type="hidden" name="step" value="confirm">
+                <input type="hidden" name="specialty" value="<%= form.specialty %>">
+                <input type="hidden" name="doctor" value="<%= form.doctor %>">
+                <input type="hidden" name="date" value="<%= form.date %>">
+                <input type="hidden" name="time" value="<%= form.time %>">
+                <input type="hidden" name="name" value="<%= form.name %>">
+                <input type="hidden" name="phone" value="<%= form.phone %>">
+                <input type="hidden" name="email" value="<%= form.email %>">
+                <button class="btn btn-primary rounded-pill px-4" type="submit">Confirm booking</button>
+              </form>
+            <% } %>
+          <% } %>
+        </div>
+      </div>
+    </main>
+<%- include("partials/footer", { clinicName }) %>

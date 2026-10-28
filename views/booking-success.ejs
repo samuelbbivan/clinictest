@@ -1,0 +1,23 @@
+<%- include("partials/header", { clinicName, area }) %>
+    <main class="booking-section section-padding">
+      <div class="container">
+        <div class="booking-panel mx-auto">
+          <div class="alert <%= paid ? 'alert-success' : 'alert-warning' %>" role="status"><%= message %></div>
+          <% if (appointment) { %>
+            <h1 class="booking-step-title"><%= paid ? 'Booking confirmed' : 'Payment not completed' %></h1>
+            <dl class="booking-summary">
+              <div><dt>Confirmation</dt><dd><%= appointment.id %></dd></div>
+              <div><dt>Status</dt><dd><%= appointment.status %></dd></div>
+              <div><dt>Specialty</dt><dd><%= appointment.specialty %></dd></div>
+              <div><dt>Doctor</dt><dd><%= appointment.doctor %></dd></div>
+              <div><dt>Appointment</dt><dd><%= appointment.appointmentDateTime.replace("T", " ") %></dd></div>
+              <div><dt>Patient</dt><dd><%= appointment.patientName %></dd></div>
+            </dl>
+          <% } else { %>
+            <h1 class="booking-step-title">Payment verification</h1>
+          <% } %>
+          <a class="btn btn-primary rounded-pill px-4" href="/">Return to clinic home</a>
+        </div>
+      </div>
+    </main>
+<%- include("partials/footer", { clinicName }) %>

@@ -1,0 +1,40 @@
+<%- include("partials/header", { clinicName, area }) %>
+    <main class="booking-section section-padding">
+      <div class="container">
+        <div class="section-heading text-center">
+          <span class="eyebrow">Patient portal</span>
+          <h1 class="section-title mt-2">My Appointments</h1>
+          <p class="section-lead">Your appointments, newest first.</p>
+        </div>
+        <div class="booking-panel mx-auto mt-4">
+          <% if (appointments.length === 0) { %>
+            <p class="mb-0">You don’t have any appointments yet. <a href="/booking">Book an appointment</a>.</p>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead><tr><th>Appointment</th><th>Specialty &amp; doctor</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                  <% appointments.forEach((appointment) => { %>
+                    <tr>
+                      <td><%= appointment.appointmentDateTime.replace("T", " ") %></td>
+                      <td><%= appointment.specialty %><br><span class="text-secondary"><%= appointment.doctor %></span></td>
+                      <td><span class="badge <%= appointment.status === 'Booked' ? 'text-bg-primary' : 'text-bg-secondary' %>"><%= appointment.status %></span></td>
+                      <td>
+                        <% if (appointment.status === "Booked") { %>
+                          <form method="post" action="/my-appointments/<%= appointment.id %>/cancel">
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Cancel</button>
+                          </form>
+                        <% } else { %>
+                          <span class="text-secondary">—</span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+<%- include("partials/footer", { clinicName }) %>

@@ -1,0 +1,21 @@
+<%- include("../partials/header", { clinicName, area }) %>
+    <main class="booking-section section-padding">
+      <div class="container">
+        <div class="booking-panel mx-auto">
+          <h1 class="booking-step-title">Patient login</h1>
+          <% if (errors.form) { %><div class="alert alert-danger" role="alert"><%= errors.form %></div><% } %>
+          <form method="post" action="/login">
+            <div class="mb-3">
+              <label class="form-label" for="email">Email</label>
+              <input class="form-control" id="email" name="email" type="email" autocomplete="email" maxlength="254" value="<%= form.email || '' %>" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label" for="password">Password</label>
+              <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" maxlength="72" required>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4" type="submit">Login</button>
+          </form>
+        </div>
+      </div>
+    </main>
+<%- include("../partials/footer", { clinicName }) %>
